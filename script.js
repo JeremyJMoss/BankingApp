@@ -68,6 +68,19 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
+const formatMovementDate = function (dateObj) {
+  const calcDaysPassed = (date1, date2) =>
+    Math.abs(date2 - date1) / (1000 * 60 * 60 * 24);
+  const daysPassed = calcDaysPassed(new Date(), dateObj);
+
+  console.log(daysPassed);
+
+  const day = `${dateObj.getDate()}`.padStart(2, 0);
+  const month = `${dateObj.getMonth() + 1}`.padStart(2, 0);
+  const year = dateObj.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 const displayMovements = function (account, sort = false) {
   containerMovements.innerHTML = "";
   const movs = sort
@@ -76,10 +89,7 @@ const displayMovements = function (account, sort = false) {
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? "deposit" : "withdrawal";
     const dateObj = new Date(account.movementsDates[i]);
-    const day = `${dateObj.getDate()}`.padStart(2, 0);
-    const month = `${dateObj.getMonth() + 1}`.padStart(2, 0);
-    const year = dateObj.getFullYear();
-    const date = `${day}/${month}/${year}`;
+    const date = formatMovementDate(dateObj);
     const html = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
     <div class="movements__date">${date}</div>
