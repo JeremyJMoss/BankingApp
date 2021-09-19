@@ -70,15 +70,17 @@ const inputClosePin = document.querySelector(".form__input--pin");
 
 const formatMovementDate = function (dateObj) {
   const calcDaysPassed = (date1, date2) =>
-    Math.abs(date2 - date1) / (1000 * 60 * 60 * 24);
+    Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
   const daysPassed = calcDaysPassed(new Date(), dateObj);
-
-  console.log(daysPassed);
-
-  const day = `${dateObj.getDate()}`.padStart(2, 0);
-  const month = `${dateObj.getMonth() + 1}`.padStart(2, 0);
-  const year = dateObj.getFullYear();
-  return `${day}/${month}/${year}`;
+  if (daysPassed === 0) return "Today";
+  if (daysPassed === 1) return "Yesterday";
+  if (daysPassed <= 7) return `${daysPassed} days ago`;
+  else {
+    const day = `${dateObj.getDate()}`.padStart(2, 0);
+    const month = `${dateObj.getMonth() + 1}`.padStart(2, 0);
+    const year = dateObj.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
 };
 
 const displayMovements = function (account, sort = false) {
@@ -93,7 +95,9 @@ const displayMovements = function (account, sort = false) {
     const html = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
     <div class="movements__date">${date}</div>
-    <div class="movements__value">${mov < 0 ? "-$" : "$"}${Math.abs(mov)}</div>
+    <div class="movements__value">${mov < 0 ? "-$" : "$"}${Math.abs(
+      mov
+    ).toFixed(2)}</div>
   </div>`;
 
     containerMovements.insertAdjacentHTML("afterbegin", html);
@@ -150,13 +154,16 @@ const updateUI = function (acc) {
 
 const createNewTime = function () {
   const now = new Date();
-  const day = `${now.getDate()}`.padStart(2, 0);
-  const month = `${now.getMonth() + 1}`.padStart(2, 0);
-  const year = now.getFullYear();
-  const hour = now.getHours();
-  const min = `${now.getMinutes()}`.padStart(2, 0);
-  const time = `${day}/${month}/${year} ${hour}:${min}`;
-  labelDate.textContent = `${time}`;
+  const options = {
+    hour: "numeric",
+    minute: "numeric",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    weekday: "short",
+  };
+  const locale = navigator.language;
+  labelDate.textContent = new Intl.DateTimeFormat(locale, options).format(now);
 };
 
 btnLogin.addEventListener("click", function (e) {
